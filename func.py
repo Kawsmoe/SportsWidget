@@ -15,21 +15,19 @@ def nhlToday():
     today = nhl.today()
     results = []
 
-
-
     for game in today['events']:
-        comp = games['competitions'][i]
+        comp = game['competitions'][0]
         teams = {c['homeAway']: c for c in comp['competitors']}
         home, away = teams["home"], teams['away']
         results.append({
             'homeTeam': home['team']['displayName'],
             'homeLogo': home['team']['logo'],
             'homeScore': home['score'],
-            'homeRecord': home['records'][0],
+            'homeRecord': home['records'][0]['summary'],
             'awayTeam': away['team']['displayName'],
             'awayLogo': away['team']['logo'],
             'awayScore': away['score'],
-            'awayRecord': away['records'][0],
+            'awayRecord': away['records'][0]['summary'],
         })
 
 
