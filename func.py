@@ -1,10 +1,15 @@
 from espn_sports_api import NFL, NHL, Racing, MLB
 import requests
+from datetime import datetime
 
 nfl = NFL()
 nhl = NHL()
 mlb = MLB()
 Racing = Racing("indycar")
+
+def formatTime(iso):
+    dt = datetime.fromisoformat(iso).astimezone()
+    return dt.strftime("%-I:%M %p")
 
 def nhlToday():
     today = nhl.today()
@@ -27,6 +32,7 @@ def nhlToday():
             'awayLogo': away['team']['logo'],
             'awayScore': away['score'],
             'awayRecord': away['records'][0]['summary'],
+            'time': formatTime(game['date'])
         })
 
 
