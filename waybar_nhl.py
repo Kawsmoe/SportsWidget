@@ -2,7 +2,7 @@ import json
 import os
 import time
 import urllib.request
-from func import nhlToday
+from func import nhlToday, nhlYesterday
 
 CACHE = os.path.expanduser("~/.cache/waybar-nhl")
 SHOW_SECONDS = 15
@@ -45,28 +45,42 @@ def show(game, tooltip):
     print(json.dumps({"text": text, "tooltip": tooltip}), flush=True)
 
 
-games = []
+def line(g):
+    return f"{g['awayTeam']} {g['awayScore']} @ {g['homeTeam']} {g['homeScore']} ({g['status']})"
+
+
+today_games = []
+yesterday_games = []
 last_fetch = 0
 index = 0
 
 while True:
     if time.time() - last_fetch > REFRESH_SECONDS:
         try:
-            games = nhlToday()
+            today_games = nhlToday()
+        except Exception:
+            pass
+        try:
+            yesterday_games = [
+                {**g, 'status': f"Yesterday, {g['status']}"} for g in nhlYesterday()
+            ]
         except Exception:
             pass
         last_fetch = time.time()
 
+    games = today_games + yesterday_games
     if not games:
         print(json.dumps({"text": "No NHL games"}), flush=True)
         time.sleep(60)
         last_fetch = 0
         continue
 
-    tooltip = "\n".join(
-        f"{g['awayTeam']} {g['awayScore']} @ {g['homeTeam']} {g['homeScore']} ({g['status']})"
-        for g in games
-    )
+    sections = []
+    if today_games:
+        sections.append("Today\n" + "\n".join(line(g) for g in today_games))
+    if yesterday_games:
+        sections.append("Yesterday\n" + "\n".join(line(g) for g in yesterday_games))
+    tooltip = "\n\n".join(sections)
     show(games[index % len(games)], tooltip)
     index += 1
     time.sleep(SHOW_SECONDS)
