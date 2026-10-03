@@ -8,7 +8,8 @@ from PyQt6.QtWidgets import (
     QVBoxLayout, 
     QMainWindow,
     QFrame,
-    QToolTip
+    QToolTip,
+    QPushButton
     )
 from PyQt6.QtGui import (
     QPixmap,
@@ -17,7 +18,33 @@ from PyQt6.QtGui import (
     )
 from PyQt6.QtCore import Qt
 
+class TitleBar(QWidget):
+    def __init__(self, window):
+        super().__init__()
+        self.win = window
+        self.setObjectName("titleBar")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setFixedHeight(32)
 
+        row = QHBoxLayout(self)
+        row.setContentsMargins(12, 0, 0, 0)
+        row.setSpacing(0)
+
+        row.addWidget(QLabel(window.windowTitle()))
+        row.addStretch()
+
+        minimize = QPushButton("_")
+        minimize.clicked.connect(window.showMinimized)
+        close = QPushButton("X")
+        close.setObjectName("closeButton")
+        close.clicked.connect(window.close)
+        for button in (minimize, close):
+            button.setFixedSize(40, 32)
+            row.addWidget(button)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.win.windowHandle().startSystemMove()
 
 class MainWindow(QMainWindow):
 
@@ -27,11 +54,17 @@ class MainWindow(QMainWindow):
         NHLYestderday = nhlYesterday()
         self.setWindowTitle('NHL')
         self.resize(250, 250)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
 
         widget = QWidget(self)
         self.setCentralWidget(widget)
         layout = QVBoxLayout(widget)
-        
+
+        layout.addWidget(TitleBar(self))
+
         awayTeam = QPixmap()
         homeTeam = QPixmap()
 
@@ -74,15 +107,20 @@ class MainWindow(QMainWindow):
             awayAbbr.setAlignment(Qt.AlignmentFlag.AlignCenter)
             awayAbbr.setFixedWidth(30)
             teamAway.addWidget(awayAbbr)
+
+            #AWAY SCORE
             awayScore = QLabel(awayText)
             awayScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            awayScore.setObjectName("awayScore")
             teamAway.addWidget(awayScore)
+            team.addWidget(awayCard)       
+            
+            #AT
+            at = QLabel(str("AT"))
+            at.setObjectName("atCard")
+            team.addWidget(at)
 
-            team.addWidget(awayCard)
 
-
-
-            team.addWidget(QLabel(str("AT")))
 
             #HOME TEAM
             homeCard = QFrame()
@@ -110,16 +148,22 @@ class MainWindow(QMainWindow):
             homeAbbr.setAlignment(Qt.AlignmentFlag.AlignCenter)
             homeAbbr.setFixedWidth(30)
             teamHome.addWidget(homeAbbr)
+
+            #HOME SCORE
             homeScore = QLabel(homeText)
             homeScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            homeScore.setObjectName("homeScore")
             teamHome.addWidget(homeScore)
 
             team.addWidget(homeCard)
+            
+            
             #DEETS
             time = QLabel(timeText)
             time.setContentsMargins(4, 0, 4, 0)
             time.setFixedHeight(36)
             time.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            time.setObjectName("time")
             team.addWidget(time)
 
             team.addStretch()
@@ -141,14 +185,15 @@ if __name__ == "__main__":
 
     app.setStyleSheet("""
         QMainWindow, QWidget {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: #ffffff;
             font-size: 18px;
+            border-radius: 8px;
         }
         
         QLabel {
             padding:0px;
             background: transparent;
+            color: #ffffff;
         }
 
         QToolTip{
@@ -163,6 +208,44 @@ if __name__ == "__main__":
 
         #homeCard {
             border-radius: 1px;
+        }
+
+        #titleBar {
+            background-color: #000000;
+            border-radius: 8px;      
+        }
+
+        #titleBar QPushButton {
+            background: transparent;
+            border: none;
+            color: #8b92a5;
+            border-radius: 8px;
+        }
+
+        #titleBar QPushButton:hover {
+            background-color: #2a2e3d;
+            color: #ffffff;
+        }
+
+        #closeButton:hover {
+            background-color: #e5484d;
+            color: #ffffff;
+        }
+
+        #atCard {
+            color: #000000;
+        }
+
+        #awayScore {
+            color: #ffffff;
+        }
+
+        #homeScore {
+            color: #ffffff
+        }
+
+        #time {
+            color: #000000
         }
 
     """)
