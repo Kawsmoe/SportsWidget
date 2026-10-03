@@ -7,3 +7,4 @@ venv/
 .DS_Store
 .vscode/
 *.json
+waybar_nhl.py
