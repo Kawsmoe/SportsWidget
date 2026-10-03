@@ -34,7 +34,10 @@ def nhlToday():
             'awayRecord': away['records'][0]['summary'],
             'time': formatTime(game['date']),
             'awayTeamHEX': away['team']['color'],
-            'homeTeamHEX': home['team']['color'] 
+            'homeTeamHEX': home['team']['color'],
+            'homeProbGoalie': home['probables'][0]['athlete']['fullName'],
+            'awayProbGoalie': away['probables'][0]['athlete']['fullName'],
+            #'awayGoalsLeader': away['leaders'][0]['leaders'][0]['athlete']['fullName']
         })
 
 
@@ -68,7 +71,7 @@ def nhlYesterday():
     return results
 
 
-def getTeamImage(url):
+def getImage(url):
     r = requests.get(url)
     return r.content
 

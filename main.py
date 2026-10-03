@@ -1,4 +1,4 @@
-from func import nhlToday, getTeamImage, nhlYesterday
+from func import nhlToday, getImage, nhlYesterday
 import sys
 from PyQt6.QtWidgets import (
     QApplication, 
@@ -7,7 +7,8 @@ from PyQt6.QtWidgets import (
     QHBoxLayout, 
     QVBoxLayout, 
     QMainWindow,
-    QFrame
+    QFrame,
+    QToolTip
     )
 from PyQt6.QtGui import (
     QPixmap,
@@ -24,7 +25,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         NHLtoday = nhlToday()
         NHLYestderday = nhlYesterday()
-        self.setWindowTitle('Sports Hub')
+        self.setWindowTitle('NHL')
         self.resize(250, 250)
 
         widget = QWidget(self)
@@ -53,10 +54,15 @@ class MainWindow(QMainWindow):
             awayCard.setObjectName("awayCard")
             awayCard.setContentsMargins(4, 0, 4, 0)
             awayCard.setFixedHeight(36)
-            awayCard.setStyleSheet(f"#awayCard {{ background-color: #{game['awayTeamHEX']}; border-radius: 16px; }}")
+            awayCard.setToolTip(
+                f"<b>{game['awayTeam']}</b><br>"
+                f"Record: {game['awayRecord']}<br>"
+                f"Probable Goaltender: {game['awayProbGoalie']}" 
+            )
+            awayCard.setStyleSheet(f"#awayCard {{ background-color: #{game['awayTeamHEX']}; border-radius: 8px; }}")
             teamAway = QHBoxLayout(awayCard)
 
-            awayTeam.loadFromData(getTeamImage(game['awayLogo']))
+            awayTeam.loadFromData(getImage(game['awayLogo']))
             awayLogo = QLabel()
             awayLogo.setPixmap(awayTeam.scaled(
                 20, 20,
@@ -83,11 +89,16 @@ class MainWindow(QMainWindow):
             homeCard.setObjectName("homeCard")
             homeCard.setContentsMargins(4, 0, 4, 0)
             homeCard.setFixedHeight(36)
-            homeCard.setStyleSheet(f"#homeCard {{ background-color: #{game['homeTeamHEX']}; border-radius: 16px; }}")
+            homeCard.setToolTip(
+                f"<b>{game['homeTeam']}</b><br>"
+                f"Record: {game['homeRecord']}<br>"
+                f"Probable Goaltender: {game['homeProbGoalie']}" 
+            )
+            homeCard.setStyleSheet(f"#homeCard {{ background-color: #{game['homeTeamHEX']}; border-radius: 8px; }}")
             
             teamHome = QHBoxLayout(homeCard)
 
-            homeTeam.loadFromData(getTeamImage(game['homeLogo']))
+            homeTeam.loadFromData(getImage(game['homeLogo']))
             homeLogo = QLabel()
             homeLogo.setPixmap(homeTeam.scaled(
                 20, 20,
@@ -120,16 +131,19 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    fontID = QFontDatabase.addApplicationFont("fonts/BebasNeue-Regular.ttf")
-    family = QFontDatabase.applicationFontFamilies(fontID)[0]
-    app.setFont(QFont(family, 16))
+    bebasNeue = QFontDatabase.addApplicationFont("fonts/BebasNeue-Regular.ttf")
+    BNfamily = QFontDatabase.applicationFontFamilies(bebasNeue)[0]
+    app.setFont(QFont(BNfamily, 16))
+
+    libertine = QFontDatabase.addApplicationFont("fonts/LinLibertine_R.ttf")
+    Lfamily = QFontDatabase.applicationFontFamilies(libertine)[0]
+    QToolTip.setFont(QFont(Lfamily, 16))
 
     app.setStyleSheet("""
         QMainWindow, QWidget {
-            background-color: transparent;
+            background-color: #000000;
             color: #ffffff;
             font-size: 18px;
-            border-radius: 8px;
         }
         
         QLabel {
@@ -137,14 +151,18 @@ if __name__ == "__main__":
             background: transparent;
         }
 
+        QToolTip{
+            font-family: "Linux Libertine";
+            font-size: 14px;
+            color: #ffffff;
+        }
+        
         #awayCard {
-
-            border-radius: 4px;
+            border-radius: 1px;
         }
 
         #homeCard {
-
-            border-radius: 4px;
+            border-radius: 1px;
         }
 
     """)
