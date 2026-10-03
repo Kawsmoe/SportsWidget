@@ -1,5 +1,6 @@
 from func import nhlToday, getImage, nhlYesterday
 import sys
+from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import (
     QApplication, 
     QWidget, 
@@ -50,21 +51,29 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        NHLtoday = nhlToday()
-        NHLYestderday = nhlYesterday()
         self.setWindowTitle('NHL')
         self.resize(250, 250)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-
         widget = QWidget(self)
         self.setCentralWidget(widget)
-        layout = QVBoxLayout(widget)
+        self.layout = QVBoxLayout(widget)
+        self.layout.addWidget(TitleBar(self))
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.refresh)
+        self.timer.start(60_000)
+        self.refresh()
 
-        layout.addWidget(TitleBar(self))
+    def refresh(self):
 
+        while self.layout.count() > 1:
+            item = self.layout.takeAt(1)
+            item.widget().deleteLater()
+
+        NHLtoday = nhlToday()
+        
         awayTeam = QPixmap()
         homeTeam = QPixmap()
 
@@ -169,7 +178,7 @@ class MainWindow(QMainWindow):
             team.addStretch()
 
             #LAYOUT
-            layout.addWidget(card)
+            self.layout.addWidget(card)
 
 
 if __name__ == "__main__":
