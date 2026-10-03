@@ -32,7 +32,9 @@ def nhlToday():
             'awayLogo': away['team']['logo'],
             'awayScore': away['score'],
             'awayRecord': away['records'][0]['summary'],
-            'time': formatTime(game['date'])
+            'time': formatTime(game['date']),
+            'awayTeamHEX': away['team']['color'],
+            'homeTeamHEX': home['team']['color'] 
         })
 
 

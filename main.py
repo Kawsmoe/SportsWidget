@@ -35,6 +35,15 @@ class MainWindow(QMainWindow):
         homeTeam = QPixmap()
 
         for game in NHLtoday:
+            if game['state'] == 'pre':
+                awayText = ""
+                homeText = ""
+                timeText = str(game['time'])
+            else:
+                awayText = str(game['awayScore'])
+                homeText = str(game['homeScore'])
+                timeText = str(game['status'])
+
             card = QFrame()
             team = QHBoxLayout(card)
             team.setContentsMargins(0, 0, 0, 0)
@@ -43,20 +52,23 @@ class MainWindow(QMainWindow):
             awayCard = QFrame()
             awayCard.setObjectName("awayCard")
             awayCard.setContentsMargins(4, 0, 4, 0)
+            awayCard.setFixedHeight(36)
+            awayCard.setStyleSheet(f"#awayCard {{ background-color: #{game['awayTeamHEX']}; border-radius: 16px; }}")
             teamAway = QHBoxLayout(awayCard)
 
             awayTeam.loadFromData(getTeamImage(game['awayLogo']))
             awayLogo = QLabel()
             awayLogo.setPixmap(awayTeam.scaled(
-                14, 14,
+                20, 20,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
                 ))
             teamAway.addWidget(awayLogo)
             awayAbbr = QLabel(str(game['awayAbbr']))
             awayAbbr.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            awayAbbr.setFixedWidth(30)
             teamAway.addWidget(awayAbbr)
-            awayScore = QLabel(str(game['awayScore']))
+            awayScore = QLabel(awayText)
             awayScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
             teamAway.addWidget(awayScore)
 
@@ -70,26 +82,34 @@ class MainWindow(QMainWindow):
             homeCard = QFrame()
             homeCard.setObjectName("homeCard")
             homeCard.setContentsMargins(4, 0, 4, 0)
+            homeCard.setFixedHeight(36)
+            homeCard.setStyleSheet(f"#homeCard {{ background-color: #{game['homeTeamHEX']}; border-radius: 16px; }}")
+            
             teamHome = QHBoxLayout(homeCard)
 
             homeTeam.loadFromData(getTeamImage(game['homeLogo']))
             homeLogo = QLabel()
             homeLogo.setPixmap(homeTeam.scaled(
-                14, 14,
+                20, 20,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
                 ))
             teamHome.addWidget(homeLogo)
             homeAbbr = QLabel(str(game['homeAbbr']))
             homeAbbr.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            homeAbbr.setFixedWidth(30)
             teamHome.addWidget(homeAbbr)
-            homeScore = QLabel(str(game['homeScore']))
+            homeScore = QLabel(homeText)
             homeScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
             teamHome.addWidget(homeScore)
 
             team.addWidget(homeCard)
             #DEETS
-            team.addWidget(QLabel(str(game['time'])))
+            time = QLabel(timeText)
+            time.setContentsMargins(4, 0, 4, 0)
+            time.setFixedHeight(36)
+            time.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            team.addWidget(time)
 
             team.addStretch()
 
@@ -106,23 +126,25 @@ if __name__ == "__main__":
 
     app.setStyleSheet("""
         QMainWindow, QWidget {
-            background-color: #000000;
+            background-color: transparent;
             color: #ffffff;
             font-size: 18px;
+            border-radius: 8px;
         }
         
         QLabel {
             padding:0px;
+            background: transparent;
         }
 
         #awayCard {
-            background-color: #67d;
-            border-radius: 16px;
+
+            border-radius: 4px;
         }
 
         #homeCard {
-            background-color: #69a;
-            border-radius: 16px;
+
+            border-radius: 4px;
         }
 
     """)
