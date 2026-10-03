@@ -35,13 +35,13 @@ class MainWindow(QMainWindow):
 
             awayTeam.loadFromData(getTeamImage(game['awayLogo']))
             awayLogo = QLabel()
-            awayLogo.setPixmap(awayTeam.scaled(40, 40))
+            awayLogo.setPixmap(awayTeam.scaled(30, 30))
             team.addWidget(awayLogo)
             scores.addWidget(QLabel(str(game['awayScore'])))
 
             homeTeam.loadFromData(getTeamImage(game['homeLogo']))
             homeLogo = QLabel()
-            homeLogo.setPixmap(homeTeam.scaled(40, 40))
+            homeLogo.setPixmap(homeTeam.scaled(30, 30))
             team.addWidget(homeLogo)
             scores.addWidget(QLabel(str(game['homeScore'])))
 
@@ -53,10 +53,23 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setStyleSheet("""
+        QMainWindow, QWidget {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: "Inter", sans-serif;
+            font-size: 16px;
+        }
+        QLabel {
+            padding:2px;
+        }
+    """)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
     
+from PyQt6.QtGui import QPixmap
+
 
 
 
