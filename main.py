@@ -6,7 +6,8 @@ from PyQt6.QtWidgets import (
     QLabel, 
     QHBoxLayout, 
     QVBoxLayout, 
-    QMainWindow
+    QMainWindow,
+    QFrame
     )
 from PyQt6.QtGui import (
     QPixmap,
@@ -24,7 +25,7 @@ class MainWindow(QMainWindow):
         NHLtoday = nhlToday()
         NHLYestderday = nhlYesterday()
         self.setWindowTitle('Sports Hub')
-        self.resize(300, 300)
+        self.resize(250, 250)
 
         widget = QWidget(self)
         self.setCentralWidget(widget)
@@ -33,55 +34,67 @@ class MainWindow(QMainWindow):
         awayTeam = QPixmap()
         homeTeam = QPixmap()
 
-
         for game in NHLtoday:
-            team = QHBoxLayout()
-            team.setSpacing(0)
+            card = QFrame()
+            team = QHBoxLayout(card)
             team.setContentsMargins(0, 0, 0, 0)
-            scores = QHBoxLayout()
 
             #AWAY TEAM
+            awayCard = QFrame()
+            awayCard.setObjectName("awayCard")
+            awayCard.setContentsMargins(4, 0, 4, 0)
+            teamAway = QHBoxLayout(awayCard)
+
             awayTeam.loadFromData(getTeamImage(game['awayLogo']))
             awayLogo = QLabel()
             awayLogo.setPixmap(awayTeam.scaled(
-                16, 16,
+                14, 14,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
                 ))
-            team.addWidget(awayLogo)
+            teamAway.addWidget(awayLogo)
             awayAbbr = QLabel(str(game['awayAbbr']))
             awayAbbr.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            team.addWidget(awayAbbr)
+            teamAway.addWidget(awayAbbr)
             awayScore = QLabel(str(game['awayScore']))
             awayScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            team.addWidget(awayScore)
+            teamAway.addWidget(awayScore)
+
+            team.addWidget(awayCard)
+
 
 
             team.addWidget(QLabel(str("AT")))
 
-
             #HOME TEAM
+            homeCard = QFrame()
+            homeCard.setObjectName("homeCard")
+            homeCard.setContentsMargins(4, 0, 4, 0)
+            teamHome = QHBoxLayout(homeCard)
+
             homeTeam.loadFromData(getTeamImage(game['homeLogo']))
             homeLogo = QLabel()
             homeLogo.setPixmap(homeTeam.scaled(
-                16, 16,
+                14, 14,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
                 ))
-            team.addWidget(homeLogo)
+            teamHome.addWidget(homeLogo)
             homeAbbr = QLabel(str(game['homeAbbr']))
             homeAbbr.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            team.addWidget(homeAbbr)
+            teamHome.addWidget(homeAbbr)
             homeScore = QLabel(str(game['homeScore']))
             homeScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            team.addWidget(homeScore)
+            teamHome.addWidget(homeScore)
 
+            team.addWidget(homeCard)
             #DEETS
             team.addWidget(QLabel(str(game['time'])))
 
+            team.addStretch()
+
             #LAYOUT
-            layout.addLayout(team)
-            layout.setSpacing(2)
+            layout.addWidget(card)
 
 
 if __name__ == "__main__":
@@ -89,16 +102,27 @@ if __name__ == "__main__":
 
     fontID = QFontDatabase.addApplicationFont("fonts/BebasNeue-Regular.ttf")
     family = QFontDatabase.applicationFontFamilies(fontID)[0]
-    app.setFont(QFont(family, 12))
+    app.setFont(QFont(family, 16))
 
     app.setStyleSheet("""
         QMainWindow, QWidget {
             background-color: #000000;
             color: #ffffff;
-            font-size: 16px;
+            font-size: 18px;
         }
+        
         QLabel {
-            padding:2px;
+            padding:0px;
+        }
+
+        #awayCard {
+            background-color: #67d;
+            border-radius: 16px;
+        }
+
+        #homeCard {
+            background-color: #69a;
+            border-radius: 16px;
         }
 
     """)
