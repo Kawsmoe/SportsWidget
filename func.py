@@ -31,6 +31,11 @@ def nhlToday():
 
 
     return results
-    
-    
+
+
+def getTeamImage(url):
+    r = requests.get(url)
+    return r.content
+
+
 

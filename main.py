@@ -1,4 +1,4 @@
-from func import nhlToday
+from func import nhlToday, getTeamImage
 import sys
 from PyQt6.QtWidgets import (
     QApplication, 
@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout, 
     QMainWindow
     )
+from PyQt6.QtGui import QPixmap
 
 
 
@@ -22,18 +23,31 @@ class MainWindow(QMainWindow):
         widget = QWidget(self)
         self.setCentralWidget(widget)
         layout = QVBoxLayout(widget)
+        
+        awayTeam = QPixmap()
+        homeTeam = QPixmap()
+
 
         for game in NHLtoday:
-            row = QHBoxLayout()
-            row.addWidget(QLabel(str(
-                game['awayTeam'] + " " +
-                game['awayScore'] + " " +
-                " at " +
-                game['homeTeam'] + " " +
-                game['homeScore']
-                )))
-            row.addWidget(QLabel(str(game['awayScore'])))
-            layout.addLayout(row)
+            team = QHBoxLayout()
+            scores = QHBoxLayout()
+            
+            awayTeam.loadFromData(getTeamImage(game['awayLogo']))
+            awayLogo = QLabel()
+            awayLogo.setPixmap(awayTeam.scaled(40, 40))
+            team.addWidget(awayLogo)
+            scores.addWidget(QLabel(str(game['awayScore'])))
+            
+            homeTeam.loadFromData(getTeamImage(game['homeLogo']))
+            homeLogo = QLabel()
+            homeLogo.setPixmap(homeTeam.scaled(40, 40))
+            team.addWidget(homeLogo)
+            scores.addWidget(QLabel(str(game['homeScore'])))
+
+
+            layout.addLayout(team)
+            layout.addLayout(scores)
+
 
 
 if __name__ == "__main__":
