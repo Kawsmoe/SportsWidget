@@ -9,19 +9,29 @@ from PyQt6.QtWidgets import (
     QMainWindow
     )
 
-NHLtoday = nhlToday()
+
 
 class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        NHLtoday = nhlToday()
         self.setWindowTitle('Sports Hub')
         self.resize(400, 300)
-        
-        layout = QVBoxLayout(self)
-        for game in nhlToday():
+
+        widget = QWidget(self)
+        self.setCentralWidget(widget)
+        layout = QVBoxLayout(widget)
+
+        for game in NHLtoday:
             row = QHBoxLayout()
-            row.addWidget(QLabel(game('awayTeam')))
+            row.addWidget(QLabel(str(
+                game['awayTeam'] + " " +
+                game['awayScore'] + " " +
+                " at " +
+                game['homeTeam'] + " " +
+                game['homeScore']
+                )))
             row.addWidget(QLabel(str(game['awayScore'])))
             layout.addLayout(row)
 
