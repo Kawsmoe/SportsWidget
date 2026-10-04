@@ -1,6 +1,6 @@
 from func import nhlToday, getImage, nhlYesterday
 import sys
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QApplication, 
     QWidget, 
@@ -10,12 +10,14 @@ from PyQt6.QtWidgets import (
     QMainWindow,
     QFrame,
     QToolTip,
-    QPushButton
+    QPushButton,
+    QGraphicsDropShadowEffect
     )
 from PyQt6.QtGui import (
     QPixmap,
     QFontDatabase,
-    QFont
+    QFont,
+    QColor
     )
 from PyQt6.QtCore import Qt
 
@@ -47,6 +49,62 @@ class TitleBar(QWidget):
         if event.button() == Qt.MouseButton.LeftButton:
             self.win.windowHandle().startSystemMove()
 
+class ClickableFrame(QFrame):
+    clicked = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+
+class GameWindow(QWidget):
+    def __init__(self, game):
+        super().__init__()
+        self.setWindowTitle(f"{game['awayAbbr']} @ {game['homeAbbr']}")
+        self.resize(250, 250)
+        self.setObjectName("gameWindow")
+        self.layout = QVBoxLayout(self)
+        self.layout.setSpacing(0)
+
+        self.awayTeamLogo = QPixmap()
+        self.homeTeamLogo = QPixmap()
+
+        #AWAY TEAM
+        self.awayTeam = QFrame()
+        self.awayTeam.setObjectName("awayTeamFrame")
+        self.awayTeam.setStyleSheet(f"#awayTeamFrame {{ background-color: #{game['awayTeamHEX']}; border-radius: 8px; color: #ffffff; }}")
+
+        self.teamAway = QHBoxLayout(self.awayTeam)
+        self.awayTeamLogo.loadFromData(getImage(game['awayLogo']))       
+        self.teamAwayLogo = QLabel()
+        self.teamAwayLogo.setPixmap(self.awayTeamLogo.scaled(
+            40, 40,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        ))
+        self.teamAway.addWidget(self.teamAwayLogo)
+        self.teamAway.addWidget(QLabel(f"{game['awayTeam']}"))
+        self.teamAway.addWidget(QLabel(f"{game['awayScore']}"))
+        self.teamAway.addWidget(QLabel(f"{game['awayRecord']}"))
+
+
+        self.homeTeam = QFrame()
+        self.homeTeam.setObjectName("homeTeamFrame")
+        self.homeTeam.setStyleSheet(f"#homeTeamFrame {{ background-color: #{game['homeTeamHEX']}; border-radius: 8px; color: #ffffff;}}")
+
+        self.teamHome = QHBoxLayout(self.homeTeam)
+        self.teamHome.addWidget(QLabel(f"{game['homeTeam']}"))
+        self.teamHome.addWidget(QLabel(f"{game['homeScore']}"))
+        self.teamHome.addWidget(QLabel(f"{game['homeRecord']}"))
+
+
+
+        self.layout.addWidget(self.awayTeam)
+        self.layout.addWidget(self.homeTeam)
+
 class MainWindow(QMainWindow):
 
     def __init__(self):
@@ -65,6 +123,10 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.refresh)
         self.timer.start(60_000)
         self.refresh()
+
+    def openGame(self, game):
+        self.gameWindow = GameWindow(game)
+        self.gameWindow.show()
 
     def refresh(self):
 
@@ -87,9 +149,13 @@ class MainWindow(QMainWindow):
                 homeText = str(game['homeScore'])
                 timeText = str(game['status'])
 
-            card = QFrame()
+
+            card = ClickableFrame()
+            card.clicked.connect(lambda g=game: self.openGame(g))
+            card.setObjectName("gameRow")
             team = QHBoxLayout(card)
             team.setContentsMargins(0, 0, 0, 0)
+
 
             #AWAY TEAM
             awayCard = QFrame()
@@ -99,7 +165,6 @@ class MainWindow(QMainWindow):
             awayCard.setToolTip(
                 f"<b>{game['awayTeam']}</b><br>"
                 f"Record: {game['awayRecord']}<br>"
-                f"Probable Goaltender: {game['awayProbGoalie']}" 
             )
             awayCard.setStyleSheet(f"#awayCard {{ background-color: #{game['awayTeamHEX']}; border-radius: 8px; }}")
             teamAway = QHBoxLayout(awayCard)
@@ -138,11 +203,9 @@ class MainWindow(QMainWindow):
             homeCard.setFixedHeight(36)
             homeCard.setToolTip(
                 f"<b>{game['homeTeam']}</b><br>"
-                f"Record: {game['homeRecord']}<br>"
-                f"Probable Goaltender: {game['homeProbGoalie']}" 
+                f"Record: {game['homeRecord']}"
             )
             homeCard.setStyleSheet(f"#homeCard {{ background-color: #{game['homeTeamHEX']}; border-radius: 8px; }}")
-            
             teamHome = QHBoxLayout(homeCard)
 
             homeTeam.loadFromData(getImage(game['homeLogo']))
@@ -171,14 +234,16 @@ class MainWindow(QMainWindow):
             time = QLabel(timeText)
             time.setContentsMargins(4, 0, 4, 0)
             time.setFixedHeight(36)
-            time.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            time.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             time.setObjectName("time")
+            team.addStretch()            
             team.addWidget(time)
 
-            team.addStretch()
+
 
             #LAYOUT
             self.layout.addWidget(card)
+
 
 
 if __name__ == "__main__":
@@ -194,7 +259,6 @@ if __name__ == "__main__":
 
     app.setStyleSheet("""
         QMainWindow, QWidget {
-            background-color: #ffffff;
             font-size: 18px;
             border-radius: 8px;
         }
@@ -202,7 +266,6 @@ if __name__ == "__main__":
         QLabel {
             padding:0px;
             background: transparent;
-            color: #ffffff;
         }
 
         QToolTip{
@@ -250,12 +313,22 @@ if __name__ == "__main__":
         }
 
         #homeScore {
-            color: #ffffff
+            color: #ffffff;
         }
 
         #time {
-            color: #000000
+            color: #000000;
         }
+
+        #gameRow {
+            background-color: #ffffff;
+        }
+
+        #gameWindow {
+            background-color: #ffffff;
+            border-radius: 8px;
+        }
+
 
     """)
     window = MainWindow()
