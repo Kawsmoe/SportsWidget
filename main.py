@@ -64,7 +64,7 @@ class GameWindow(QWidget):
     def __init__(self, game):
         super().__init__()
         self.setWindowTitle(f"{game['awayAbbr']} @ {game['homeAbbr']}")
-        self.resize(250, 250)
+        self.resize(800, 800)
         self.setObjectName("gameWindow")
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(0)
@@ -78,6 +78,8 @@ class GameWindow(QWidget):
         self.awayTeam.setStyleSheet(f"#awayTeamFrame {{ background-color: #{game['awayTeamHEX']}; border-radius: 8px; color: #ffffff; }}")
 
         self.teamAway = QHBoxLayout(self.awayTeam)
+        
+        #AWAY TEAM LOGO
         self.awayTeamLogo.loadFromData(getImage(game['awayLogo']))       
         self.teamAwayLogo = QLabel()
         self.teamAwayLogo.setPixmap(self.awayTeamLogo.scaled(
@@ -86,20 +88,44 @@ class GameWindow(QWidget):
             Qt.TransformationMode.SmoothTransformation,
         ))
         self.teamAway.addWidget(self.teamAwayLogo)
-        self.teamAway.addWidget(QLabel(f"{game['awayTeam']}"))
-        self.teamAway.addWidget(QLabel(f"{game['awayScore']}"))
-        self.teamAway.addWidget(QLabel(f"{game['awayRecord']}"))
+        
+        self.teamAway.addWidget(QLabel(f"{game['awayLocation']}\n{game['awayName']}\n{game['awayRecord']}"))
+        
+        #AWAY TEAM SCORE
+        self.awayScore = QLabel(f"{game['awayScore']}")
+        self.awayScore.setObjectName("awayGameScore")
+        self.awayScore.setStyleSheet("#awayGameScore; text-size: 36px")
+        self.awayScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.teamAway.addWidget(self.awayScore)
 
 
+
+
+        #HOME TEAM
         self.homeTeam = QFrame()
         self.homeTeam.setObjectName("homeTeamFrame")
         self.homeTeam.setStyleSheet(f"#homeTeamFrame {{ background-color: #{game['homeTeamHEX']}; border-radius: 8px; color: #ffffff;}}")
-
+        
         self.teamHome = QHBoxLayout(self.homeTeam)
-        self.teamHome.addWidget(QLabel(f"{game['homeTeam']}"))
-        self.teamHome.addWidget(QLabel(f"{game['homeScore']}"))
-        self.teamHome.addWidget(QLabel(f"{game['homeRecord']}"))
-
+        
+        #HOME TEAM LOGO
+        self.homeTeamLogo.loadFromData(getImage(game['homeLogo']))
+        self.teamHomeLogo = QLabel()
+        self.teamHomeLogo.setPixmap(self.homeTeamLogo.scaled(
+            40, 40,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        ))
+    
+        self.teamHome.addWidget(self.teamHomeLogo)
+        self.teamHome.addWidget(QLabel(f"{game['homeLocation']}\n{game['homeName']}\n{game['homeRecord']}"))
+        
+        #HOME TEAM SCORE
+        self.homeScore = QLabel(f"{game['homeScore']}")
+        self.homeScore.setObjectName("homeGameScore")
+        self.homeScore.setStyleSheet("#homeGameScore; text-size: 18px;")
+        self.homeScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.teamHome.addWidget(self.homeScore)
 
 
         self.layout.addWidget(self.awayTeam)
@@ -259,7 +285,6 @@ if __name__ == "__main__":
 
     app.setStyleSheet("""
         QMainWindow, QWidget {
-            font-size: 18px;
             border-radius: 8px;
         }
         
@@ -327,6 +352,7 @@ if __name__ == "__main__":
         #gameWindow {
             background-color: #ffffff;
             border-radius: 8px;
+            font-size: 36px;
         }
 
 

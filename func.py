@@ -38,7 +38,11 @@ def nhlToday():
             'homeProbGoalie': home['probables'][0]['athlete']['fullName'],
             'awayProbGoalie': away['probables'][0]['athlete']['fullName'],
             #'awayGoalsLeader': away['leaders'][0]['leaders'][0]['athlete']['fullName'],
-            'gameID': game['id']
+            'gameID': game['id'],
+            'awayLocation': away['team']['location'],
+            'awayName': away['team']['name'],
+            'homeLocation': home['team']['location'],
+            'homeName': home['team']['name']
         })
 
 
