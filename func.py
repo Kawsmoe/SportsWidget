@@ -42,7 +42,9 @@ def nhlToday():
             'awayLocation': away['team']['location'],
             'awayName': away['team']['name'],
             'homeLocation': home['team']['location'],
-            'homeName': home['team']['name']
+            'homeName': home['team']['name'],
+            'awayPeriods': [l['displayValue'] for l in away.get('linescores', [])],
+            'homePeriods': [l['displayValue'] for l in home.get('linescores', [])] 
         })
 
 
