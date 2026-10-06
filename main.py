@@ -75,8 +75,8 @@ class GameWindow(QWidget):
 
         #AWAY TEAM
         self.awayTeam = QFrame()
-        self.awayTeam.setFixedHeight(60)
-        self.awayTeam.setFixedWidth(300)
+        self.awayTeam.setFixedHeight(75)
+        self.awayTeam.setFixedWidth(350)
         self.awayTeam.setObjectName("awayTeamFrame")
         self.awayTeam.setStyleSheet(f"#awayTeamFrame {{ background-color: #{game['awayTeamHEX']}; border-radius: 8px; color: #ffffff; }}")
 
@@ -90,28 +90,35 @@ class GameWindow(QWidget):
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
         ))
+        self.teamAwayLogo.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.teamAwayLogo.setFixedWidth(40)
         self.teamAway.addWidget(self.teamAwayLogo)
         
-        self.teamName = QLabel(f"{game['awayLocation']} {game['awayName']}")
-        self.teamAway.addWidget(self.teamName)
-        self.teamName.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        #AWAY TEAM NAME
+        self.away = QLabel(f"{game['awayLocation']} {game['awayName']}")
+        self.away.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.teamAway.addWidget(self.away, 1)
 
+        #AWAY RECORD
         self.awayRecord = QLabel(f"{game['awayRecord']}")
+        self.awayRecord.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.awayRecord.setFixedWidth(60)
         self.teamAway.addWidget(self.awayRecord)
-        self.awayRecord.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         
         #AWAY TEAM SCORE
         self.awayScore = QLabel(f"{game['awayScore']}")
         self.awayScore.setObjectName("awayGameScore")
         self.awayScore.setStyleSheet("#awayGameScore; text-size: 36px")
+        self.awayScore.setFixedWidth(30)
         self.awayScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.teamAway.addWidget(self.awayScore)
 
 
         #HOME TEAM
         self.homeTeam = QFrame()
-        self.homeTeam.setFixedHeight(60)
-        self.homeTeam.setFixedWidth(300)
+        self.homeTeam.setFixedHeight(75)
+        self.homeTeam.setFixedWidth(350)
         self.homeTeam.setContentsMargins(0, 0, 0, 0)
         self.homeTeam.setObjectName("homeTeamFrame")
         self.homeTeam.setStyleSheet(f"#homeTeamFrame {{ background-color: #{game['homeTeamHEX']}; border-radius: 8px; color: #ffffff;}}")
@@ -126,13 +133,20 @@ class GameWindow(QWidget):
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
         ))
-    
+        self.teamHomeLogo.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.teamHomeLogo.setFixedWidth(40)
         self.teamHome.addWidget(self.teamHomeLogo)
-        self.teamHome.addWidget(QLabel(f"{game['homeLocation']} {game['homeName']}"))
 
-        
+        #HOME TEAM NAME
+        self.home = QLabel(f"{game['homeLocation']} {game['homeName']}")
+        self.home.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.teamHome.addWidget(self.home, 1)
+
+
+        #HOME TEAM RECORD
         self.homeRecord = QLabel(f"{game['homeRecord']}")
-        self.homeRecord.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.homeRecord.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.homeRecord.setFixedWidth(60)
         self.teamHome.addWidget(self.homeRecord)
         
 
@@ -141,10 +155,11 @@ class GameWindow(QWidget):
         self.homeScore.setObjectName("homeGameScore")
         self.homeScore.setStyleSheet("#homeGameScore; text-size: 18px; color: #000000;")
         self.homeScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.homeScore.setFixedWidth(30)
         self.teamHome.addWidget(self.homeScore)
         
 
-
+        #ADDING HOME AND AWAY TEAM TO LAYOUT
         self.layout.addWidget(self.awayTeam)
         self.layout.addWidget(self.homeTeam)
 
