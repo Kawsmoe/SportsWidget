@@ -1,6 +1,7 @@
 from espn_sports_api import NFL, NHL, Racing, MLB
 import requests
 from datetime import datetime
+import re
 
 nfl = NFL()
 nhl = NHL()
@@ -57,19 +58,50 @@ def getGoals(gameID):
 
     for play in nhlpbp['plays']:
         if play['scoringPlay']:
+            scorer = None
+            shotType = None
+            ytdScorerGoals = None
+            assists = []
+            for person in play['participants']:
+
+                if person['type'] == 'scorer':
+                    scorer = person['athlete']['displayName']
+                    ytdScorerGoals = person['ytdGoals']
+                    scorerIMG = person['athlete'].get('headshot', {}).get('href')
+                    m = re.search(r"Goal \((\d+)\) (.+?)(?:,|$)", play['text'])
+                    if m:
+                        shotType = m.group(2)
+                elif person['type'] == 'assister':
+                    assists.append({
+                        'assistName': person['athlete']['displayName'], 
+                        'ytdAssists': person['ytdAssists'],
+                        'assistIMG': person['athlete'].get('headshot', {}).get('href'),
+                        })
+            primaryAssist = assists[0] if len(assists) > 0 else None
+            secondaryAssist = assists[1] if len(assists) > 1 else None
+            
             goals.append({
                 'teamID': play['team']['id'],
                 'period': play['period']['number'],
                 'strength': play['strength']['text'],
-                'xCoord': play['coordinate']['x'],
-                'yCoord': play['coordinate']['y'],
+                'xCoord': play['coordinate'].get('x', {}),
+                'yCoord': play['coordinate'].get('y', {}),
                 'tog': play['clock']['displayValue'],
-                'scorer': play['participants'][0]['athlete']['displayName'],
-                'primaryAssist': play['participants'][1]['athlete']['displayName'],
-                'secondaryAssist': play['participants'][2]['athlete']['displayName'],
-
-
+                'scorer': scorer,
+                'scorerIMG': scorerIMG,
+                'scorerYTDGoals': ytdScorerGoals,
+                'shotType': shotType,
+                'primaryAssist': primaryAssist if primaryAssist else None,
+                'primaryAssistName': primaryAssist['assistName'] if primaryAssist else None,
+                'primaryAssistYTD': primaryAssist['ytdAssists'] if primaryAssist else None,
+                'primaryAssistIMG': primaryAssist['assistIMG'] if primaryAssist else None,
+                'secondaryAssist': secondaryAssist if secondaryAssist else None,
+                'secondaryAssistName': secondaryAssist['assistName'] if secondaryAssist else None,
+                'secondaryAssistYTD': secondaryAssist['ytdAssists'] if secondaryAssist else None,
+                'secondaryAssistIMG': secondaryAssist['assistIMG'] if secondaryAssist else None
             })
+
+    return goals
 
 
 def getImage(url):
