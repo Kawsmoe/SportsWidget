@@ -1,4 +1,4 @@
-from func import nhlToday, getImage, nhlYesterday
+from func import nhlToday, getImage, nhlYesterday, periodName
 import sys
 from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
@@ -92,6 +92,7 @@ class TeamRow(QFrame):
         row.addWidget(recordLabel)
         row.addWidget(scoreLabel)
 
+
 class boxScore(QWidget):
     def __init__(self, game):
         super().__init__()
@@ -112,9 +113,9 @@ class boxScore(QWidget):
         for i, goals in enumerate(game['homePeriods']):
             layout.addWidget(QLabel(goals), 2, i + 1)
 
-        layout.addWidget(QLabel("1st"), 0, 1)
-        layout.addWidget(QLabel("2nd"), 0, 2)
-        layout.addWidget(QLabel("3rd"), 0, 3)
+        for i in range(len(game['awayPeriods'])):
+            layout.addWidget(QLabel(periodName(i + 1)), 0, i + 1)
+
         layout.addWidget(awayLabel, 1, 0)
         layout.addWidget(homeLabel, 2, 0)
 
