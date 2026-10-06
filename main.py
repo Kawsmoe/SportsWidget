@@ -68,12 +68,15 @@ class GameWindow(QWidget):
         self.setObjectName("gameWindow")
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(0)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
         self.awayTeamLogo = QPixmap()
         self.homeTeamLogo = QPixmap()
 
         #AWAY TEAM
         self.awayTeam = QFrame()
+        self.awayTeam.setFixedHeight(60)
+        self.awayTeam.setFixedWidth(300)
         self.awayTeam.setObjectName("awayTeamFrame")
         self.awayTeam.setStyleSheet(f"#awayTeamFrame {{ background-color: #{game['awayTeamHEX']}; border-radius: 8px; color: #ffffff; }}")
 
@@ -89,7 +92,13 @@ class GameWindow(QWidget):
         ))
         self.teamAway.addWidget(self.teamAwayLogo)
         
-        self.teamAway.addWidget(QLabel(f"{game['awayLocation']}\n{game['awayName']}\n{game['awayRecord']}"))
+        self.teamName = QLabel(f"{game['awayLocation']} {game['awayName']}")
+        self.teamAway.addWidget(self.teamName)
+        self.teamName.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+        self.awayRecord = QLabel(f"{game['awayRecord']}")
+        self.teamAway.addWidget(self.awayRecord)
+        self.awayRecord.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         #AWAY TEAM SCORE
         self.awayScore = QLabel(f"{game['awayScore']}")
@@ -99,10 +108,11 @@ class GameWindow(QWidget):
         self.teamAway.addWidget(self.awayScore)
 
 
-
-
         #HOME TEAM
         self.homeTeam = QFrame()
+        self.homeTeam.setFixedHeight(60)
+        self.homeTeam.setFixedWidth(300)
+        self.homeTeam.setContentsMargins(0, 0, 0, 0)
         self.homeTeam.setObjectName("homeTeamFrame")
         self.homeTeam.setStyleSheet(f"#homeTeamFrame {{ background-color: #{game['homeTeamHEX']}; border-radius: 8px; color: #ffffff;}}")
         
@@ -118,14 +128,21 @@ class GameWindow(QWidget):
         ))
     
         self.teamHome.addWidget(self.teamHomeLogo)
-        self.teamHome.addWidget(QLabel(f"{game['homeLocation']}\n{game['homeName']}\n{game['homeRecord']}"))
+        self.teamHome.addWidget(QLabel(f"{game['homeLocation']} {game['homeName']}"))
+
         
+        self.homeRecord = QLabel(f"{game['homeRecord']}")
+        self.homeRecord.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.teamHome.addWidget(self.homeRecord)
+        
+
         #HOME TEAM SCORE
         self.homeScore = QLabel(f"{game['homeScore']}")
         self.homeScore.setObjectName("homeGameScore")
-        self.homeScore.setStyleSheet("#homeGameScore; text-size: 18px;")
+        self.homeScore.setStyleSheet("#homeGameScore; text-size: 18px; color: #000000;")
         self.homeScore.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.teamHome.addWidget(self.homeScore)
+        
 
 
         self.layout.addWidget(self.awayTeam)
@@ -136,7 +153,6 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('NHL')
-        self.resize(250, 250)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -160,7 +176,7 @@ class MainWindow(QMainWindow):
             item = self.layout.takeAt(1)
             item.widget().deleteLater()
 
-        NHLtoday = nhlToday()
+        NHLtoday = nhlToday()            #card.setFixedHeight(36)
         
         awayTeam = QPixmap()
         homeTeam = QPixmap()
@@ -269,7 +285,7 @@ class MainWindow(QMainWindow):
 
             #LAYOUT
             self.layout.addWidget(card)
-
+            #self.adjustSize()
 
 
 if __name__ == "__main__":
