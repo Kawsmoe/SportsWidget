@@ -84,7 +84,7 @@ def getGoals(gameID):
             
             goals.append({
                 'teamID': play['team']['id'],
-                'period': play['period']['number'],
+                'period': play['period']['displayValue'],
                 'strength': play['strength']['text'],
                 'xCoord': play['coordinate'].get('x', {}),
                 'yCoord': play['coordinate'].get('y', {}),

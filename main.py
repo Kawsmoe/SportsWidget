@@ -30,6 +30,10 @@ from PyQt6.QtGui import (
     )
 from PyQt6.QtCore import Qt
 
+
+
+
+
 class TitleBar(QWidget):
     def __init__(self, window):
         super().__init__()
@@ -58,6 +62,9 @@ class TitleBar(QWidget):
         if event.button() == Qt.MouseButton.LeftButton:
             self.win.windowHandle().startSystemMove()
 
+
+
+
 class ClickableFrame(QFrame):
     clicked = pyqtSignal()
 
@@ -68,6 +75,8 @@ class ClickableFrame(QFrame):
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
+
+
 
 
 class TeamRow(QFrame):
@@ -101,6 +110,8 @@ class TeamRow(QFrame):
         row.addWidget(scoreLabel)
 
 
+
+
 class boxScore(QWidget):
     def __init__(self, game):
         super().__init__()
@@ -127,6 +138,9 @@ class boxScore(QWidget):
         layout.addWidget(awayLabel, 1, 0)
         layout.addWidget(homeLabel, 2, 0)
 
+
+
+
 class GoalScorers(QWidget):
     def __init__(self, game):
         super().__init__()
@@ -145,24 +159,56 @@ class GoalScorers(QWidget):
             frame = QFrame()
             frame.setObjectName("goalFrame")
             frame.setStyleSheet(f"#goalFrame {{ background-color: #{color}; border-radius: 8px; }}")
+            frame.setFixedHeight(70)
             scoringBox = QHBoxLayout(frame)
             
             #PLAYER PHOTO
             playerPhoto = QPixmap()
             playerPhoto.loadFromData(getImage(goal['scorerIMG']))
             scorerIMG = QLabel()
-            scorerIMG.setPixmap(playerPhoto.scaled(60, 60, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
-            scorerIMG.setFixedWidth(60)
+            scorerIMG.setPixmap(playerPhoto.scaled(70, 70, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+            scorerIMG.setFixedWidth(70)
 
             #PLAYER NAME
-            playerNameLabel = QLabel(goal['scorer'] + "  (" + str(goal['scorerYTDGoals']) + ")")
+            
+            playerNameLabel = QLabel(goal['scorer'] + " (" + str(goal['scorerYTDGoals']) + ")")
             playerNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+            playerNameLabel.setFixedHeight(20)
 
+
+            #ASSIST NAMES
+            assistNames = []
+
+            if goal['primaryAssistName']:
+                assistNames.append(f'{goal['primaryAssistName']} ({goal['primaryAssistYTD']})')
+            if goal['secondaryAssistName']:
+                assistNames.append(f'{goal['secondaryAssistName']} ({goal['secondaryAssistYTD']})')
+
+            if assistNames:
+                assistText = "Assists: " + ", ".join(assistNames)
+            else:
+                assistText = "Unassisted"
+
+            assistsLabel = QLabel(assistText)
+            assistsLabel.setObjectName("assistsLabel")
+            assistsLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+            assistsLabel.setFixedHeight(20)
+            
+            togLabel = QLabel(goal['tog'])
+            togLabel.setObjectName("tog")
+
+            textColumn = QVBoxLayout()
+            textColumn.setSpacing(0)
+            textColumn.setContentsMargins(0, 0, 0, 0)
+            textColumn.addWidget(playerNameLabel)
+            textColumn.addWidget(assistsLabel)
+            textColumn.addWidget(togLabel)
 
             scoringBox.addWidget(scorerIMG)
-            scoringBox.addWidget(playerNameLabel)
+            scoringBox.addLayout(textColumn)
 
             layout.addWidget(frame)
+            layout.addStretch()
 
 
 
@@ -190,6 +236,9 @@ class GameWindow(QWidget):
         ))
         layout.addWidget(boxScore(game))
         layout.addWidget(GoalScorers(game))
+
+
+
 
 
 class MainWindow(QMainWindow):
@@ -415,6 +464,13 @@ if __name__ == "__main__":
             font-size: 36px;
         }
 
+        #assistsLabel {
+            font-size: 14px;
+        }
+
+        #tog {
+            font-size: 12px;
+        }
 
     """)
     window = MainWindow()
