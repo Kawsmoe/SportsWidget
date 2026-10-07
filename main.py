@@ -171,7 +171,7 @@ class GoalScorers(QWidget):
 
             #PLAYER NAME
             
-            playerNameLabel = QLabel(goal['scorer'] + " (" + str(goal['scorerYTDGoals']) + ")")
+            playerNameLabel = QLabel(f"{goal['scorer']} ({goal['scorerYTDGoals']})")
             playerNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             playerNameLabel.setFixedHeight(20)
 
@@ -194,7 +194,8 @@ class GoalScorers(QWidget):
             assistsLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             assistsLabel.setFixedHeight(20)
             
-            togLabel = QLabel(goal['tog'])
+            #TIME OF GAME
+            togLabel = QLabel(f"{goal['tog']} - {goal['strength']} - {goal['shotType']}")
             togLabel.setObjectName("tog")
 
             textColumn = QVBoxLayout()
