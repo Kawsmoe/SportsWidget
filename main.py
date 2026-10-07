@@ -1,6 +1,14 @@
-from func import nhlToday, getImage, nhlYesterday, periodName
+from func import (
+    nhlToday, 
+    getImage, 
+    periodName, 
+    getGoals
+    )
 import sys
-from PyQt6.QtCore import QTimer, pyqtSignal
+from PyQt6.QtCore import (
+    QTimer, 
+    pyqtSignal
+    )
 from PyQt6.QtWidgets import (
     QApplication, 
     QWidget, 
@@ -67,7 +75,7 @@ class TeamRow(QFrame):
         super().__init__()
         self.setFixedSize(325, 75)
         self.setStyleSheet(f"background-color: #{color}; border-radius: 8px;")
-        self.setFixedHeight(50)
+        self.setFixedHeight(60)
 
         row = QHBoxLayout(self)
 
@@ -119,6 +127,45 @@ class boxScore(QWidget):
         layout.addWidget(awayLabel, 1, 0)
         layout.addWidget(homeLabel, 2, 0)
 
+class GoalScorers(QWidget):
+    def __init__(self, game):
+        super().__init__()
+
+        goals = getGoals(game['gameID'])
+
+        layout = QVBoxLayout(self)
+
+        for goal in goals:
+            
+            if goal['teamID'] == game['awayTeamID']:
+                color = game['awayTeamHEX']
+            else:
+                color = game['homeTeamHEX']
+
+            frame = QFrame()
+            frame.setObjectName("goalFrame")
+            frame.setStyleSheet(f"#goalFrame {{ background-color: #{color}; border-radius: 8px; }}")
+            scoringBox = QHBoxLayout(frame)
+            
+            #PLAYER PHOTO
+            playerPhoto = QPixmap()
+            playerPhoto.loadFromData(getImage(goal['scorerIMG']))
+            scorerIMG = QLabel()
+            scorerIMG.setPixmap(playerPhoto.scaled(60, 60, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+            scorerIMG.setFixedWidth(60)
+
+            #PLAYER NAME
+            playerNameLabel = QLabel(goal['scorer'] + "  (" + str(goal['scorerYTDGoals']) + ")")
+            playerNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+
+            scoringBox.addWidget(scorerIMG)
+            scoringBox.addWidget(playerNameLabel)
+
+            layout.addWidget(frame)
+
+
+
 
 
 class GameWindow(QWidget):
@@ -142,6 +189,7 @@ class GameWindow(QWidget):
             game['homeTeamHEX']
         ))
         layout.addWidget(boxScore(game))
+        layout.addWidget(GoalScorers(game))
 
 
 class MainWindow(QMainWindow):
