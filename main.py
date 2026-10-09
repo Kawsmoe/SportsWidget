@@ -7,7 +7,9 @@ from func import (
 import sys
 from PyQt6.QtCore import (
     QTimer, 
-    pyqtSignal
+    pyqtSignal,
+    QPointF,
+    QRectF
     )
 from PyQt6.QtWidgets import (
     QApplication, 
@@ -26,10 +28,12 @@ from PyQt6.QtGui import (
     QPixmap,
     QFontDatabase,
     QFont,
-    QColor
+    QColor,
+    QPainter,
+    QPen,
+    QBrush,
     )
 from PyQt6.QtCore import Qt
-
 
 
 
@@ -212,32 +216,64 @@ class GoalScorers(QWidget):
             layout.addStretch()
 
 
+class Rink(QWidget):
+    def __init__(self, goals):
+        super().__init__()
+        self.goals = goals
+        self.setMinimumSize(400, 170)
 
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        W, H = self.width(), self.height()
 
+        p.setPen(QPen(QColor("#9bb"), 2))
+        p.setBrush(QBrush(QColor("#eef")))
+        p.drawRoundedRect(QRectF(1, 1, W - 2, H - 2), 30, 30)
+
+        p.setPen(QPen(QColor("#c33"), 2))
+        p.drawLine(QPointF(W / 2, 0), QPointF(W / 2, H))
+
+        for g in self.goals:
+            px = (g['xCoord'] + 100) / 200 * W
+            py = (42.5 - g['yCoord']) / 85 * H
+            p.setPen(QPen(QColor("black"), 1))
+            p.setBrush(QBrush(QColor("#e31937")))
+            p.drawEllipse(QPointF(px, py), 5, 5)
 
 class GameWindow(QWidget):
     def __init__(self, game):
         super().__init__()
 
+        goals = getGoals(game['gameID'])
+
+        layout = QHBoxLayout(self)
         #WINDOW
-        layout = QVBoxLayout(self)
-        layout.addWidget(TeamRow(
+        layoutLeft = QVBoxLayout(self)
+        layoutLeft.addWidget(TeamRow(
             game['awayLogo'], 
             game['awayTeam'],
             game['awayRecord'],
             game['awayScore'],
             game['awayTeamHEX']
             ))
-        layout.addWidget(TeamRow(
+        layoutLeft.addWidget(TeamRow(
             game['homeLogo'],
             game['homeTeam'],
             game['homeRecord'],
             game['homeScore'],
             game['homeTeamHEX']
         ))
-        layout.addWidget(boxScore(game))
-        layout.addWidget(GoalScorers(game))
+        layoutLeft.addWidget(boxScore(game))
+        layoutLeft.addWidget(GoalScorers(game))
+        
+        rink = Rink(goals)
+        rink.setFixedHeight(500)
+        rink.setFixedHeight(213)
 
+
+        layout.addLayout(layoutLeft)
+        layout.addWidget(rink, alignment=Qt.AlignmentFlag.AlignTop)
 
 
 
