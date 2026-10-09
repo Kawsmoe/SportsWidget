@@ -106,6 +106,44 @@ def getGoals(gameID):
     return goals
 
 
+def getShots(gameID):
+    nhlpbp = nhl.playbyplay(gameID)
+
+    shots = []
+
+    for play in nhlpbp['plays']:
+        if play['type']['text'] in ('Shot', 'Missed', 'Blocked', 'Goal'):
+            shooter = None
+            saver = None
+            shotType = None
+
+            m = re.search(r"\b(Wrist Shot|Snap Shot|Slap Shot|Backhand|Tip-In|Deflected|Wrap-around)\b", play['text'])
+            if m:
+                shotType = m.group(1)
+
+            for person in play['participants']:
+
+                if person.get('type') in ('shooter', 'scorer'):
+                    shooter = person['athlete']['displayName']
+                    
+                    
+                if person.get('type') == 'saver':
+                    saver = person['athlete']['displayName']
+                    
+
+            shots.append({
+                'teamID': play['team']['id'],
+                'period': play['period']['displayValue'],
+                'strength': play['strength']['text'],
+                'xCoord': play['coordinate'].get('x', None),
+                'yCoord': play['coordinate'].get('y', None),
+                'tos': play['clock']['displayValue'],
+                'shooter': shooter,
+                'saver': saver,
+                'shotType': shotType,
+            })
+    return shots
+
 def getImage(url):
     r = requests.get(url)
     return r.content
