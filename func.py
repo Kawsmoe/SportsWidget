@@ -38,7 +38,7 @@ def nhlToday():
             'awayTeamHEX': away['team']['color'],
             'awayTeamID': away['team']['id'],
             'homeTeamHEX': home['team']['color'],
-            'homeTeamID': home['team']['color'],
+            'homeTeamID': home['team']['id'],
             'homeProbGoalie': home['probables'][0]['athlete']['fullName'],
             'awayProbGoalie': away['probables'][0]['athlete']['fullName'],
             'gameID': game['id'],
@@ -131,7 +131,9 @@ def getShots(gameID):
                 if person.get('type') == 'saver':
                     saver = person['athlete']['displayName']
                     
-
+            if 'team' not in play:
+                continue
+            
             shots.append({
                 'teamID': play['team']['id'],
                 'period': play['period']['displayValue'],

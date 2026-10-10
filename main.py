@@ -33,7 +33,8 @@ from PyQt6.QtGui import (
     QPainter,
     QPen,
     QBrush,
-    QPainterPath
+    QPainterPath,
+    QRadialGradient
     )
 from PyQt6.QtCore import Qt
 
@@ -336,7 +337,12 @@ class Rink(QWidget):
 
             x = s['xCoord']
             y = s['yCoord']
+            teamID = s['teamID']
+
             if x is None or y is None:
+                continue
+
+            if teamID is None:
                 continue
 
             if s['teamID'] == self.game['awayTeamID']:
@@ -353,9 +359,18 @@ class Rink(QWidget):
             px = (x + 100) / 200 * W
             py = (42.5 - y) / 85 * H
 
-            p.setPen(QPen(QColor(f"#{color}")))
-            p.setBrush(QBrush(QColor(f"#{color}")))
-            p.drawEllipse(QPointF(px, py), 2, 2)
+            c = QColor(f"#{color}")
+            c.setAlpha(255)
+            clear = QColor(f'#{color}')
+            clear.setAlpha(0)
+
+            grad = QRadialGradient(QPointF(px,py), 5 * fx)
+            grad.setColorAt(0, c)
+            grad.setColorAt(1, clear)
+
+            p.setPen(QPen(Qt.PenStyle.NoPen))
+            p.setBrush(QBrush(grad))
+            p.drawEllipse(QPointF(px, py), 9 * fx, 9 * fx)
 
         for g in self.goals:
 
