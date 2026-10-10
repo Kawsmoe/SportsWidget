@@ -32,6 +32,7 @@ from PyQt6.QtGui import (
     QPainter,
     QPen,
     QBrush,
+    QPainterPath
     )
 from PyQt6.QtCore import Qt
 
@@ -223,11 +224,12 @@ class Rink(QWidget):
         super().__init__()
         self.game = game
         self.goals = goals
-        self.setMinimumSize(400, 170)
+        self.setFixedSize(500,212)
 
 
 
     def paintEvent(self, event):
+
 
         awayLogo = QPixmap()
         awayLogo.loadFromData(getImage(self.game['awayLogo']))
@@ -239,18 +241,96 @@ class Rink(QWidget):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         W, H = self.width(), self.height()
 
-        p.setPen(QPen(QColor("#9bb"), 2))
-        p.setBrush(QBrush(QColor("#eef")))
-        p.drawRoundedRect(QRectF(1, 1, W - 2, H - 2), 30, 30)
+        fx = W / 200
+        fy = H /85
 
+        def X(x): return (x + 100) * fx
+        def Y(y): return (42.5 - y) * fy
+
+        #WHOLE ICE
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QBrush(QColor("#eef")))
+        p.drawRoundedRect(QRectF(1, 1, W - 2, H - 2), 28 * fx, 28 * fy)
+
+        #RED LINE
         p.setPen(QPen(QColor("#c33"), 2))
         p.drawLine(QPointF(W / 2, 0), QPointF(W / 2, H))
 
+        #LEFT BLUE LINE
         p.setPen(QPen(QColor("blue"), 2))
         p.drawLine(QPointF((-25 + 100) / 200 * W , 0), QPointF((-25 + 100) / 200 * W , H))
 
+        #RIGHT BLUE LINE
         p.setPen(QPen(QColor("blue"), 2))
         p.drawLine(QPointF((25 + 100) / 200 * W , 0), QPointF((25 + 100) / 200 * W , H))
+
+        #CENTER ICE CIRCLE
+        p.setPen(QPen(QColor("blue"), 1))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawEllipse(QPointF(W / 2, H / 2), 15 * (W / 200), 15 * (H / 85))
+
+        #CENTER ICE DOT
+        p.setPen(QPen(QColor("blue"), 1))
+        p.setBrush(QBrush(QColor("blue")))
+        p.drawEllipse(QPointF(W / 2, H / 2), 0.5 * fx, 0.5 * fy)
+
+
+        #LEFT GOAL LINE
+        p.setPen(QPen(QColor("red"), 1))
+        p.drawLine(QPointF((89 + 100) / 200 * W , 17), QPointF((89 + 100) / 200 * W , H - 17))
+
+        #RIGHT GOAL LINE
+        p.setPen(QPen(QColor("red"), 1))
+        p.drawLine(QPointF((-89 + 100) / 200 * W , 17), QPointF((-89 + 100) / 200 * W , H - 17))
+
+        #LEFT NET
+        p.setPen(QPen(QColor("red"), 1))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRect(QRectF((-93 + 100) / 200 * W, (42.5 - 3) / 85 * H, 4 * W / 200, 6 * H /85))
+
+        #RIGHT NET
+        p.setPen(QPen(QColor("red"), 1))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRect(QRectF((89 + 100) / 200 * W, (42.5 - 3) / 85 * H, 4 * W / 200, 6 * H /85))
+
+        #CREASES
+        p.setPen(QPen(QColor("red"), 1))
+        p.setBrush(QBrush(QColor("#bde")))
+        for side in (-1, 1):
+
+            x0 = X(89 * side)
+            cy = Y(0)
+            out = -side * 4.47 * fx
+            box = QRectF(x0 - 6 * fx, cy - 6 * fy, 12 * fx, 12 * fy)
+
+            path = QPainterPath()
+            path.moveTo(x0, cy - 4 * fy)
+            path.lineTo(x0 + out, cy - 4 * fy)
+            if side == -1:
+                path.arcTo(box, 41.8, -83.6)
+            else:
+                path.arcTo(box, 138.2, 83.6)
+            path.lineTo(x0, cy + 4 * fy)
+            path.closeSubpath()
+            p.drawPath(path)
+
+        #END ZONE FACEOFF CIRCLES AND DOTS
+        for side in (-1, 1):
+            for row in (-1, 1):
+                cx, cy = X(69 * side), Y(22 * row)
+                p.setPen(QPen(QColor("red"), 1))
+                p.setBrush(Qt.BrushStyle.NoBrush)
+                p.drawEllipse(QPointF(cx, cy), 15 * fx, 15 * fy)
+                p.setBrush(QBrush(QColor("red")))
+                p.drawEllipse(QPointF(cx, cy), 1 * fx, 1 * fy)
+
+        #NEUTRAL ZONE DOTS
+        p.setPen(QPen(QColor("red"), 1))
+        p.setBrush(QBrush(QColor("red")))
+        for side in (-1, 1):
+            for row in (-1, 1):
+                p.drawEllipse(QPointF(X(20 * side), Y(22 * row)), 1 * fx, 1 * fy)
+
 
 
         for g in self.goals:
@@ -264,6 +344,11 @@ class Rink(QWidget):
             p.setPen(QPen(QColor("black"), 1))
             p.setBrush(QBrush(QColor(f"#{color}")))
             p.drawEllipse(QPointF(px, py), 5, 5)
+
+        #OUTLINE
+        p.setPen(QPen(QColor("#9bb"), 2))
+        p.setBrush(QBrush(Qt.BrushStyle.NoBrush))
+        p.drawRoundedRect(QRectF(1, 1, W - 2, H - 2), 28 * fx, 28 * fy)
 
 class GameWindow(QWidget):
     def __init__(self, game):
@@ -292,9 +377,6 @@ class GameWindow(QWidget):
         layoutLeft.addWidget(GoalScorers(game))
         
         rink = Rink(game, goals)
-        rink.setFixedHeight(500)
-        rink.setFixedHeight(213)
-
 
         layout.addLayout(layoutLeft)
         layout.addWidget(rink, alignment=Qt.AlignmentFlag.AlignTop)
