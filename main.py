@@ -217,12 +217,24 @@ class GoalScorers(QWidget):
 
 
 class Rink(QWidget):
-    def __init__(self, goals):
+
+
+    def __init__(self, game, goals):
         super().__init__()
+        self.game = game
         self.goals = goals
         self.setMinimumSize(400, 170)
 
+
+
     def paintEvent(self, event):
+
+        awayLogo = QPixmap()
+        awayLogo.loadFromData(getImage(self.game['awayLogo']))
+
+        homeLogo = QPixmap()
+        homeLogo.loadFromData(getImage(self.game['homeLogo']))
+
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         W, H = self.width(), self.height()
@@ -234,11 +246,23 @@ class Rink(QWidget):
         p.setPen(QPen(QColor("#c33"), 2))
         p.drawLine(QPointF(W / 2, 0), QPointF(W / 2, H))
 
+        p.setPen(QPen(QColor("blue"), 2))
+        p.drawLine(QPointF((-25 + 100) / 200 * W , 0), QPointF((-25 + 100) / 200 * W , H))
+
+        p.setPen(QPen(QColor("blue"), 2))
+        p.drawLine(QPointF((25 + 100) / 200 * W , 0), QPointF((25 + 100) / 200 * W , H))
+
+
         for g in self.goals:
+            if g['teamID'] == self.game['awayTeamID']:
+                color = self.game['awayTeamHEX']
+            else:
+                color = self.game['homeTeamHEX']
+                
             px = (g['xCoord'] + 100) / 200 * W
             py = (42.5 - g['yCoord']) / 85 * H
             p.setPen(QPen(QColor("black"), 1))
-            p.setBrush(QBrush(QColor("#e31937")))
+            p.setBrush(QBrush(QColor(f"#{color}")))
             p.drawEllipse(QPointF(px, py), 5, 5)
 
 class GameWindow(QWidget):
@@ -267,7 +291,7 @@ class GameWindow(QWidget):
         layoutLeft.addWidget(boxScore(game))
         layoutLeft.addWidget(GoalScorers(game))
         
-        rink = Rink(goals)
+        rink = Rink(game, goals)
         rink.setFixedHeight(500)
         rink.setFixedHeight(213)
 
