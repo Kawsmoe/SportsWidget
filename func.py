@@ -2,6 +2,7 @@ from espn_sports_api import NFL, NHL, Racing, MLB
 import requests
 from datetime import datetime
 import re
+import pandas as pd
 
 nfl = NFL()
 nhl = NHL()
@@ -141,6 +142,9 @@ def getShots(gameID):
                 'shooter': shooter,
                 'saver': saver,
                 'shotType': shotType,
+                'scoringPlay': play['scoringPlay'],
+                'typeOfShot': play['type']['abbreviation']
+                
             })
     return shots
 

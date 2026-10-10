@@ -2,7 +2,8 @@ from func import (
     nhlToday, 
     getImage, 
     periodName, 
-    getGoals
+    getGoals,
+    getShots
     )
 import sys
 from PyQt6.QtCore import (
@@ -220,17 +221,19 @@ class GoalScorers(QWidget):
 class Rink(QWidget):
 
 
-    def __init__(self, game, goals):
+    def __init__(self, game, goals, shots):
         super().__init__()
         self.game = game
         self.goals = goals
+        self.shots = shots
         self.setFixedSize(500,212)
+
         self.awayLogo = QPixmap()
         self.awayLogo.loadFromData(getImage(self.game['awayLogo']))
         self.awayLogo = self.awayLogo.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.homeLogo = QPixmap()
         self.homeLogo.loadFromData(getImage(self.game['homeLogo']))
-        self.homeLogo = self.homeLogo.scaled(70, 70, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        self.homeLogo = self.homeLogo.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
 
     def paintEvent(self, event):
@@ -329,6 +332,30 @@ class Rink(QWidget):
             for row in (-1, 1):
                 p.drawEllipse(QPointF(X(20 * side), Y(22 * row)), 1 * fx, 1 * fy)
 
+        for s in self.shots:
+
+            x = s['xCoord']
+            y = s['yCoord']
+            if x is None or y is None:
+                continue
+
+            if s['teamID'] == self.game['awayTeamID']:
+                color = self.game['awayTeamHEX']
+
+                if x < 0:
+                    x, y = -x, -y
+                
+            else:
+                color = self.game['homeTeamHEX']
+                if x > 0:
+                    x, y = -x, -y
+
+            px = (x + 100) / 200 * W
+            py = (42.5 - y) / 85 * H
+
+            p.setPen(QPen(QColor(f"#{color}")))
+            p.setBrush(QBrush(QColor(f"#{color}")))
+            p.drawEllipse(QPointF(px, py), 2, 2)
 
         for g in self.goals:
 
@@ -355,6 +382,9 @@ class Rink(QWidget):
         #AWAY LOGO
         p.drawPixmap(QPointF(X(12) - self.awayLogo.width() / 2, Y (0) - self.awayLogo.height() / 2), self.awayLogo)
 
+        #HOME LOGO
+        p.drawPixmap(QPointF(X(-12) - self.homeLogo.width() / 2, Y (0) - self.homeLogo.height() / 2), self.homeLogo)
+
 
         #OUTLINE
         p.setPen(QPen(QColor("#9bb"), 2))
@@ -369,6 +399,7 @@ class GameWindow(QWidget):
         super().__init__()
 
         goals = getGoals(game['gameID'])
+        shots = getShots(game['gameID'])
 
         layout = QHBoxLayout(self)
         #WINDOW
@@ -390,7 +421,7 @@ class GameWindow(QWidget):
         layoutLeft.addWidget(boxScore(game))
         layoutLeft.addWidget(GoalScorers(game))
         
-        rink = Rink(game, goals)
+        rink = Rink(game, goals, shots)
 
         layout.addLayout(layoutLeft)
         layout.addWidget(rink, alignment=Qt.AlignmentFlag.AlignTop)

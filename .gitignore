@@ -7,4 +7,5 @@ venv/
 .DS_Store
 .vscode/
 *.json
+*.csv
 waybar_nhl.py
