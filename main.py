@@ -225,17 +225,15 @@ class Rink(QWidget):
         self.game = game
         self.goals = goals
         self.setFixedSize(500,212)
-
+        self.awayLogo = QPixmap()
+        self.awayLogo.loadFromData(getImage(self.game['awayLogo']))
+        self.awayLogo = self.awayLogo.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        self.homeLogo = QPixmap()
+        self.homeLogo.loadFromData(getImage(self.game['homeLogo']))
+        self.homeLogo = self.homeLogo.scaled(70, 70, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
 
     def paintEvent(self, event):
-
-
-        awayLogo = QPixmap()
-        awayLogo.loadFromData(getImage(self.game['awayLogo']))
-
-        homeLogo = QPixmap()
-        homeLogo.loadFromData(getImage(self.game['homeLogo']))
 
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -332,23 +330,39 @@ class Rink(QWidget):
                 p.drawEllipse(QPointF(X(20 * side), Y(22 * row)), 1 * fx, 1 * fy)
 
 
-
         for g in self.goals:
+
+            x = g['xCoord']
+            y = g['yCoord']
+
+
             if g['teamID'] == self.game['awayTeamID']:
                 color = self.game['awayTeamHEX']
+                if x < 0:
+                    x, y = -x, -y
+                
             else:
                 color = self.game['homeTeamHEX']
+                if x > 0:
+                    x, y = -x, -y
                 
-            px = (g['xCoord'] + 100) / 200 * W
-            py = (42.5 - g['yCoord']) / 85 * H
+            px = (x + 100) / 200 * W
+            py = (42.5 - y) / 85 * H
             p.setPen(QPen(QColor("black"), 1))
             p.setBrush(QBrush(QColor(f"#{color}")))
             p.drawEllipse(QPointF(px, py), 5, 5)
+
+        #AWAY LOGO
+        p.drawPixmap(QPointF(X(12) - self.awayLogo.width() / 2, Y (0) - self.awayLogo.height() / 2), self.awayLogo)
+
 
         #OUTLINE
         p.setPen(QPen(QColor("#9bb"), 2))
         p.setBrush(QBrush(Qt.BrushStyle.NoBrush))
         p.drawRoundedRect(QRectF(1, 1, W - 2, H - 2), 28 * fx, 28 * fy)
+
+
+
 
 class GameWindow(QWidget):
     def __init__(self, game):
