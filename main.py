@@ -364,7 +364,7 @@ class Rink(QWidget):
             clear = QColor(f'#{color}')
             clear.setAlpha(0)
 
-            grad = QRadialGradient(QPointF(px,py), 5 * fx)
+            grad = QRadialGradient(QPointF(px,py), 3 * fx)
             grad.setColorAt(0, c)
             grad.setColorAt(1, clear)
 
@@ -377,6 +377,8 @@ class Rink(QWidget):
             x = g['xCoord']
             y = g['yCoord']
 
+            if x is None or y is None:
+                continue
 
             if g['teamID'] == self.game['awayTeamID']:
                 color = self.game['awayTeamHEX']
@@ -390,7 +392,7 @@ class Rink(QWidget):
                 
             px = (x + 100) / 200 * W
             py = (42.5 - y) / 85 * H
-            p.setPen(QPen(QColor("black"), 1))
+            p.setPen(QPen(QColor("white"), 1))
             p.setBrush(QBrush(QColor(f"#{color}")))
             p.drawEllipse(QPointF(px, py), 5, 5)
 
@@ -452,6 +454,7 @@ class MainWindow(QMainWindow):
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.gameWindow = None
 
         widget = QWidget(self)
         self.setCentralWidget(widget)
@@ -462,9 +465,23 @@ class MainWindow(QMainWindow):
         self.timer.start(60_000)
         self.refresh()
 
-    def openGame(self, game):
-        self.gameWindow = GameWindow(game)
+    def openGame(self, game):   
+        
+        oldPOS = None
+        
+        if self.gameWindow is not None:
+            oldPOS = self.gameWindow.pos()
+            self.gameWindow.close()
+            
+        self.gameWindow = GameWindow(game)    
+        
+        if oldPOS is not None:
+            self.gameWindow.move(oldPOS)
+        
+        
         self.gameWindow.show()
+
+
 
     def refresh(self):
 
