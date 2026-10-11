@@ -227,14 +227,14 @@ class Rink(QWidget):
         self.game = game
         self.goals = goals
         self.shots = shots
-        self.setFixedSize(500,212)
+        self.setFixedSize(700,297)
 
         self.awayLogo = QPixmap()
         self.awayLogo.loadFromData(getImage(self.game['awayLogo']))
-        self.awayLogo = self.awayLogo.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        self.awayLogo = self.awayLogo.scaled(60, 60, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.homeLogo = QPixmap()
         self.homeLogo.loadFromData(getImage(self.game['homeLogo']))
-        self.homeLogo = self.homeLogo.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        self.homeLogo = self.homeLogo.scaled(60, 60, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
 
     def paintEvent(self, event):
@@ -360,7 +360,7 @@ class Rink(QWidget):
             py = (42.5 - y) / 85 * H
 
             c = QColor(f"#{color}")
-            c.setAlpha(255)
+            c.setAlpha(100)
             clear = QColor(f'#{color}')
             clear.setAlpha(0)
 
@@ -369,8 +369,8 @@ class Rink(QWidget):
             grad.setColorAt(1, clear)
 
             p.setPen(QPen(Qt.PenStyle.NoPen))
-            p.setBrush(QBrush(grad))
-            p.drawEllipse(QPointF(px, py), 9 * fx, 9 * fx)
+            p.setBrush(QBrush(c))
+            p.drawEllipse(QPointF(px, py), 2 * fx, 2 * fx)
 
         for g in self.goals:
 
@@ -394,7 +394,7 @@ class Rink(QWidget):
             py = (42.5 - y) / 85 * H
             p.setPen(QPen(QColor("white"), 1))
             p.setBrush(QBrush(QColor(f"#{color}")))
-            p.drawEllipse(QPointF(px, py), 5, 5)
+            p.drawEllipse(QPointF(px, py), 7, 7)
 
         #AWAY LOGO
         p.drawPixmap(QPointF(X(12) - self.awayLogo.width() / 2, Y (0) - self.awayLogo.height() / 2), self.awayLogo)
