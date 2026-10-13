@@ -23,7 +23,8 @@ from PyQt6.QtWidgets import (
     QToolTip,
     QPushButton,
     QGraphicsDropShadowEffect,
-    QGridLayout
+    QGridLayout,
+    QComboBox
     )
 from PyQt6.QtGui import (
     QPixmap,
@@ -227,6 +228,9 @@ class Rink(QWidget):
         self.game = game
         self.goals = goals
         self.shots = shots
+        self.teamFilter = None
+        self.periodFilter = None
+        self.shotTypeFilter = None
         self.setFixedSize(700,297)
 
         self.awayLogo = QPixmap()
@@ -235,7 +239,7 @@ class Rink(QWidget):
         self.homeLogo = QPixmap()
         self.homeLogo.loadFromData(getImage(self.game['homeLogo']))
         self.homeLogo = self.homeLogo.scaled(60, 60, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-
+        
 
     def paintEvent(self, event):
 
@@ -339,6 +343,15 @@ class Rink(QWidget):
             y = s['yCoord']
             teamID = s['teamID']
 
+            if self.teamFilter is not None and teamID != self.teamFilter:
+                continue
+
+            if self.periodFilter is not None and s['period'] != self.periodFilter:
+                continue
+
+            if self.shotTypeFilter is not None and s['typeOfShot'] !=self.shotTypeFilter:
+                continue
+
             if x is None or y is None:
                 continue
 
@@ -377,6 +390,15 @@ class Rink(QWidget):
             x = g['xCoord']
             y = g['yCoord']
 
+            if self.teamFilter is not None and g['teamID'] != self.teamFilter:
+                continue
+
+            if self.periodFilter is not None and g['periodNumber'] != self.periodFilter:
+                continue
+
+            if self.shotTypeFilter is not None and s['typeOfShot'] != self.shotTypeFilter:
+                continue
+
             if x is None or y is None:
                 continue
 
@@ -411,6 +433,7 @@ class Rink(QWidget):
 
 
 
+
 class GameWindow(QWidget):
     def __init__(self, game):
         super().__init__()
@@ -438,10 +461,58 @@ class GameWindow(QWidget):
         layoutLeft.addWidget(boxScore(game))
         layoutLeft.addWidget(GoalScorers(game))
         
+        layoutRight = QVBoxLayout()
+
+        comboBoxesLayout = QHBoxLayout()        
+        
         rink = Rink(game, goals, shots)
+        
+        #FILTER BY TEAMS
+        teamBox = QComboBox()
+        teamBox.addItem("All", None)
+        teamBox.addItem(game['awayTeam'], game['awayTeamID'])
+        teamBox.addItem(game['homeTeam'], game['homeTeamID'])
+        
+        #FILTER BY PERIODS
+        periodBox = QComboBox()
+        periodBox.addItem("All", None)
+        periodBox.addItem("1st", 1)
+        periodBox.addItem("2nd", 2)
+        periodBox.addItem("3rd", 3)
+        periodBox.addItem("OT", 4)
+
+        #FILTER BY SHOT TYPE
+        shotTypeBox = QComboBox()
+        shotTypeBox.addItem("All", None)
+        for t in sorted(set(s['typeOfShot'] for s in shots)):
+            shotTypeBox.addItem(t,t)
+        
+        #CENTER LAYOUT WITH RINK AND COMBO BOXES        
+        layoutRight.addWidget(rink)
+        comboBoxesLayout.addWidget(teamBox)
+        comboBoxesLayout.addWidget(periodBox)
+        comboBoxesLayout.addWidget(shotTypeBox)
+        layoutRight.addLayout(comboBoxesLayout)
+
+        def changeTeam():
+            rink.teamFilter = teamBox.currentData()
+            rink.update()
+        
+        def changePeriod():
+            rink.periodFilter = periodBox.currentData()
+            rink.update()
+
+        def changeShotType():
+            rink.shotTypeFilter = shotTypeBox.currentData()
+            rink.update()
+
+        teamBox.currentIndexChanged.connect(changeTeam)
+        periodBox.currentIndexChanged.connect(changePeriod)
+        shotTypeBox.currentIndexChanged.connect(changeShotType)
+
 
         layout.addLayout(layoutLeft)
-        layout.addWidget(rink, alignment=Qt.AlignmentFlag.AlignTop)
+        layout.addLayout(layoutRight)
 
 
 
