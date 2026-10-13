@@ -279,11 +279,11 @@ class Rink(QWidget):
 
         #LEFT GOAL LINE
         p.setPen(QPen(QColor("red"), 1))
-        p.drawLine(QPointF((89 + 100) / 200 * W , 17), QPointF((89 + 100) / 200 * W , H - 17))
+        p.drawLine(QPointF((89 + 100) / 200 * W , 22), QPointF((89 + 100) / 200 * W , H - 22))
 
         #RIGHT GOAL LINE
         p.setPen(QPen(QColor("red"), 1))
-        p.drawLine(QPointF((-89 + 100) / 200 * W , 17), QPointF((-89 + 100) / 200 * W , H - 17))
+        p.drawLine(QPointF((-89 + 100) / 200 * W , 22), QPointF((-89 + 100) / 200 * W , H - 22))
 
         #LEFT NET
         p.setPen(QPen(QColor("red"), 1))
