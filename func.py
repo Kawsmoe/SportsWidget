@@ -3,6 +3,7 @@ import requests
 from datetime import datetime
 import re
 import pandas as pd
+import json
 
 nfl = NFL()
 nhl = NHL()
@@ -161,6 +162,16 @@ def periodName(n):
     if n == 4:
         return "OT"
     return f"{n - 3}OT"
+
+
+#box = nhl.box_score('401892546')
+#with open ('nhl_boxscore_test.json', 'w') as f:
+#    json.dump(box, f, indent=2)
+
+with open ('nhl_boxscore_test.json') as f:
+    data = json.load(f)
+
+
 
 
 

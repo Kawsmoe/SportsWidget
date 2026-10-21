@@ -222,7 +222,6 @@ class GoalScorers(QWidget):
 
 class Rink(QWidget):
 
-
     def __init__(self, game, goals, shots):
         super().__init__()
         self.game = game
@@ -488,11 +487,12 @@ class GameWindow(QWidget):
             shotTypeBox.addItem(t,t)
         
         #CENTER LAYOUT WITH RINK AND COMBO BOXES        
-        layoutRight.addWidget(rink)
-        comboBoxesLayout.addWidget(teamBox)
-        comboBoxesLayout.addWidget(periodBox)
-        comboBoxesLayout.addWidget(shotTypeBox)
+        layoutRight.addWidget(rink, alignment=Qt.AlignmentFlag.AlignTop)
+        comboBoxesLayout.addWidget(teamBox, alignment=Qt.AlignmentFlag.AlignTop)
+        comboBoxesLayout.addWidget(periodBox, alignment=Qt.AlignmentFlag.AlignTop)
+        comboBoxesLayout.addWidget(shotTypeBox, alignment=Qt.AlignmentFlag.AlignTop)
         layoutRight.addLayout(comboBoxesLayout)
+        layoutRight.addStretch()
 
         def changeTeam():
             rink.teamFilter = teamBox.currentData()
