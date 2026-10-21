@@ -171,7 +171,25 @@ def periodName(n):
 with open ('nhl_boxscore_test.json') as f:
     data = json.load(f)
 
+def getRosters(gameID):
+    data = nhl.box_score(gameID)
+
+    rosters = []
+
+    for team in data['boxscore']['players']:
+        for group in team['statistics']:
+            for player in group['athletes']:
+                stats = dict(zip(group['labels'], player['stats']))
+                rosters.append({
+                'playerID': player['athlete']['id'],
+                'playerName': player['athlete']['displayName'],
+                'playerIMG': player['athlete']['headshot']['href'],
+                'playerNumber': player['athlete']['jersey'],
+                'playerPos': player['athlete']['position']['abbreviation'],
+                'playerTeam': team['team']['abbreviation'],
+                **stats
+                })
+    return rosters
 
 
-
-
+print (getRosters('401892546'))
