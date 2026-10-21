@@ -10,6 +10,8 @@ nhl = NHL()
 mlb = MLB()
 Racing = Racing("indycar")
 
+testGameID = '401892546'
+
 def formatTime(iso):
     dt = datetime.fromisoformat(iso).astimezone()
     return dt.strftime("%-I:%M %p")
@@ -183,6 +185,8 @@ def getRosters(gameID):
                 'playerNumber': player['athlete']['jersey'],
                 'playerPos': player['athlete']['position']['abbreviation'],
                 'playerTeam': team['team']['abbreviation'],
+                'teamID': team['team']['id'],
+                'homeAway': group['homeAway'],
                 **stats
                 })
     return rosters
@@ -206,6 +210,27 @@ def getGoalies(gameID):
                 'playerNumber': player['athlete']['jersey'],
                 'playerPos': player['athlete']['position']['abbreviation'],
                 'playerTeam': team['team']['abbreviation'],
+                'teamID': team['team']['id'],
+                'homeAway': group['homeAway'],
                 **stats
                 })
     return rosters
+
+
+def countShots(shots, awayID, homeID):
+
+    away = {}
+    home = {}
+
+    for player in shots:
+        if player['shooter'] is None:
+            continue
+
+        if player['teamID'] == awayID:
+            away[player['shooter']] = away.get(player['shooter'], 0) + 1
+        elif player['teamID'] == homeID:
+            home[player['shooter']] =  home.get(player['shooter'], 0) + 1
+
+    return away, home
+
+ 
