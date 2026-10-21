@@ -3,7 +3,8 @@ from func import (
     getImage, 
     periodName, 
     getGoals,
-    getShots
+    getShots,
+    countShots
     )
 import sys
 from PyQt6.QtCore import (
@@ -37,8 +38,15 @@ from PyQt6.QtGui import (
     QPainterPath,
     QRadialGradient
     )
-from PyQt6.QtCore import Qt
-
+from PyQt6.QtCharts import (
+    QChart,
+    QChartView,
+    QPieSeries
+    )
+from PyQt6.QtCore import (
+    Qt,
+    QMargins
+    )
 
 
 
@@ -439,6 +447,35 @@ class GameWindow(QWidget):
 
         goals = getGoals(game['gameID'])
         shots = getShots(game['gameID'])
+        awayCounts, homeCounts = countShots(shots, game['awayTeamID'], game['homeTeamID'])
+        
+        awaySeries = QPieSeries()
+        for name, count in awayCounts.items():
+            awaySeries.append(name, count)
+        
+        homeSeries = QPieSeries()
+        for name, count in homeCounts.items():
+            homeSeries.append(name, count)
+        
+        awayShotChart = QChart()
+        awayShotChart.addSeries(awaySeries)
+        awayShotChart.legend().hide()
+        awayShotChart.setTitle(game['awayTeam'])
+        awayShotChart.setBackgroundVisible(False)
+        awayShotChart.setMargins(QMargins(0, 0, 0, 0))
+        awaySeries.setPieSize(1.0)
+        awayChartView = QChartView(awayShotChart)
+        awayChartView.setFixedSize(200, 200)
+
+        homeShotChart = QChart()
+        homeShotChart.addSeries(homeSeries)
+        homeShotChart.legend().hide()
+        homeShotChart.setTitle(game['homeTeam'])
+        homeShotChart.setBackgroundVisible(False)
+        homeShotChart.setMargins(QMargins(0, 0, 0, 0))
+        homeSeries.setPieSize(1.0)
+        homeChartView = QChartView(homeShotChart)
+        homeChartView.setFixedSize(200, 200)
 
         layout = QHBoxLayout(self)
         #WINDOW
@@ -486,12 +523,19 @@ class GameWindow(QWidget):
         for t in sorted(set(s['typeOfShot'] for s in shots)):
             shotTypeBox.addItem(t,t)
         
-        #CENTER LAYOUT WITH RINK AND COMBO BOXES        
+        #CENTER LAYOUT WITH RINK AND COMBO BOXES AND SHOT CHART
         layoutRight.addWidget(rink, alignment=Qt.AlignmentFlag.AlignTop)
         comboBoxesLayout.addWidget(teamBox, alignment=Qt.AlignmentFlag.AlignTop)
         comboBoxesLayout.addWidget(periodBox, alignment=Qt.AlignmentFlag.AlignTop)
         comboBoxesLayout.addWidget(shotTypeBox, alignment=Qt.AlignmentFlag.AlignTop)
+        
+        pieCharts = QHBoxLayout()
+        pieCharts.addWidget(awayChartView)
+        pieCharts.addWidget(homeChartView)
+
         layoutRight.addLayout(comboBoxesLayout)
+        layoutRight.addLayout(pieCharts)
+
         layoutRight.addStretch()
 
         def changeTeam():
@@ -510,6 +554,7 @@ class GameWindow(QWidget):
         periodBox.currentIndexChanged.connect(changePeriod)
         shotTypeBox.currentIndexChanged.connect(changeShotType)
 
+        
 
         layout.addLayout(layoutLeft)
         layout.addLayout(layoutRight)

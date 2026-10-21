@@ -225,6 +225,9 @@ def countShots(shots, awayID, homeID):
     for player in shots:
         if player['shooter'] is None:
             continue
+        
+        if player['typeOfShot'] not in ('shot-on-goal', 'goal'):
+            continue
 
         if player['teamID'] == awayID:
             away[player['shooter']] = away.get(player['shooter'], 0) + 1
