@@ -209,5 +209,3 @@ def getGoalies(gameID):
                 **stats
                 })
     return rosters
-
-print(getRosters('401892546'))
