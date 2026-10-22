@@ -4,7 +4,9 @@ from func import (
     periodName, 
     getGoals,
     getShots,
-    countShots
+    countShots,
+    getGoalies,
+    getRosters
     )
 import sys
 from PyQt6.QtCore import (
@@ -25,7 +27,8 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QGraphicsDropShadowEffect,
     QGridLayout,
-    QComboBox
+    QComboBox,
+    QTableWidget
     )
 from PyQt6.QtGui import (
     QPixmap,
@@ -153,7 +156,6 @@ class boxScore(QWidget):
 
         layout.addWidget(awayLabel, 1, 0)
         layout.addWidget(homeLabel, 2, 0)
-
 
 
 

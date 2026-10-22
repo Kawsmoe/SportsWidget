@@ -241,4 +241,3 @@ def countShots(shots, awayID, homeID):
 
     return away, home
 
- 
