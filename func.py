@@ -155,6 +155,8 @@ def getShots(gameID):
     return shots
 
 def getImage(url):
+    if not url:
+        return b""
     r = requests.get(url)
     return r.content
 
