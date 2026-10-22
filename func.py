@@ -4,6 +4,7 @@ from datetime import datetime
 import re
 import pandas as pd
 import json
+from functools import lru_cache
 
 nfl = NFL()
 nhl = NHL()
@@ -11,6 +12,7 @@ mlb = MLB()
 Racing = Racing("indycar")
 
 testGameID = '401892546'
+
 
 def formatTime(iso):
     dt = datetime.fromisoformat(iso).astimezone()
@@ -154,6 +156,7 @@ def getShots(gameID):
             })
     return shots
 
+@lru_cache(maxsize=256)
 def getImage(url):
     if not url:
         return b""

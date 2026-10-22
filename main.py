@@ -578,7 +578,7 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(TitleBar(self))
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh)
-        self.timer.start(60_000)
+        self.timer.start(30_000)
         self.refresh()
 
     def openGame(self, game):   
@@ -810,6 +810,8 @@ if __name__ == "__main__":
 
     """)
     window = MainWindow()
+    screen = app.primaryScreen().availableGeometry()
+    window.move(screen.right() - window.width() - 20, screen.top() + 20)
     window.show()
     sys.exit(app.exec())
     
