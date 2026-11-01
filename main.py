@@ -447,6 +447,30 @@ class GameWindow(QWidget):
     def __init__(self, game):
         super().__init__()
 
+        if game['state'] == 'pre':
+            pregameWidget = QVBoxLayout(self)
+            layout = QHBoxLayout(self)
+            #WINDOW
+            layoutLeft = QVBoxLayout(self)
+            layoutLeft.addWidget(TeamRow(
+                game['awayLogo'], 
+                game['awayTeam'],
+                game['awayRecord'],
+                game['awayScore'],
+                game['awayTeamHEX']
+                ))
+            layoutLeft.addWidget(TeamRow(
+                game['homeLogo'],
+                game['homeTeam'],
+                game['homeRecord'],
+                game['homeScore'],
+                game['homeTeamHEX']
+            ))
+
+            pregameWidget.addLayout(layoutLeft)
+
+            return
+
         goals = getGoals(game['gameID'])
         shots = getShots(game['gameID'])
         awayCounts, homeCounts = countShots(shots, game['awayTeamID'], game['homeTeamID'])
