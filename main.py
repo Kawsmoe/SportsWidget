@@ -50,7 +50,10 @@ from PyQt6.QtCore import (
     Qt,
     QMargins
     )
+import os
+from PyQt6.QtSvg import QSvgRenderer
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TitleBar(QWidget):
@@ -99,12 +102,18 @@ class ClickableFrame(QFrame):
 
 
 class TeamRow(QFrame):
-    def __init__(self, logoURL, name, record, score, color):
+    def __init__(self, logoURL, name, record, score, color, abbr):
         super().__init__()
-        self.setFixedSize(325, 75)
-        self.setStyleSheet(f"background-color: #{color}; border-radius: 8px;")
-        self.setFixedHeight(60)
+        self.setFixedSize(325, 60)
+        self.customSvg = None
 
+        svgPath = os.path.join(BASE_DIR, "img", f"{abbr}.svg")
+        if os.path.exists(svgPath):
+            self.customSvg = QSvgRenderer(svgPath)
+        else:
+            self.setStyleSheet(f'background-color: #{color}; border-radius: 8px;')
+
+    
         row = QHBoxLayout(self)
 
         pixmap = QPixmap()
@@ -128,6 +137,12 @@ class TeamRow(QFrame):
         row.addWidget(recordLabel)
         row.addWidget(scoreLabel)
 
+    def paintEvent(self, event):
+        if self.customSvg is not None:
+            painter = QPainter(self)
+            self.customSvg.render(painter, QRectF(0, 0, self.width(), self.height()))
+            painter.end()
+        super().paintEvent(event)
 
 
 
@@ -457,14 +472,16 @@ class GameWindow(QWidget):
                 game['awayTeam'],
                 game['awayRecord'],
                 game['awayScore'],
-                game['awayTeamHEX']
+                game['awayTeamHEX'],
+                game['awayAbbr']
                 ))
             layoutLeft.addWidget(TeamRow(
                 game['homeLogo'],
                 game['homeTeam'],
                 game['homeRecord'],
                 game['homeScore'],
-                game['homeTeamHEX']
+                game['homeTeamHEX'],
+                game['homeAbbr']
             ))
 
             pregameWidget.addLayout(layoutLeft)
@@ -511,14 +528,16 @@ class GameWindow(QWidget):
             game['awayTeam'],
             game['awayRecord'],
             game['awayScore'],
-            game['awayTeamHEX']
+            game['awayTeamHEX'],
+            game['awayAbbr']
             ))
         layoutLeft.addWidget(TeamRow(
             game['homeLogo'],
             game['homeTeam'],
             game['homeRecord'],
             game['homeScore'],
-            game['homeTeamHEX']
+            game['homeTeamHEX'],
+            game['homeAbbr']
         ))
         layoutLeft.addWidget(boxScore(game))
         layoutLeft.addWidget(GoalScorers(game))
