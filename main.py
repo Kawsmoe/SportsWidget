@@ -51,9 +51,9 @@ from PyQt6.QtCore import (
     QMargins
     )
 import os
-from PyQt6.QtSvg import QSvgRenderer
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 
 
 class TitleBar(QWidget):
@@ -105,13 +105,7 @@ class TeamRow(QFrame):
     def __init__(self, logoURL, name, record, score, color, abbr):
         super().__init__()
         self.setFixedSize(325, 60)
-        self.customSvg = None
-
-        svgPath = os.path.join(BASE_DIR, "img", f"{abbr}.svg")
-        if os.path.exists(svgPath):
-            self.customSvg = QSvgRenderer(svgPath)
-        else:
-            self.setStyleSheet(f'background-color: #{color}; border-radius: 8px;')
+        self.setStyleSheet(f'background-color: #{color}; border-radius: 8px;')
 
     
         row = QHBoxLayout(self)
@@ -137,12 +131,6 @@ class TeamRow(QFrame):
         row.addWidget(recordLabel)
         row.addWidget(scoreLabel)
 
-    def paintEvent(self, event):
-        if self.customSvg is not None:
-            painter = QPainter(self)
-            self.customSvg.render(painter, QRectF(0, 0, self.width(), self.height()))
-            painter.end()
-        super().paintEvent(event)
 
 
 
